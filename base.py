@@ -1,27 +1,30 @@
 import numpy as np
 
-inputs = [1,3,4]
-weights = [1,2,3]
-
-
-class Layer: 
-	def __init__(self, weights, inputs, activation):
-		self.weights = weights 
-		self.inputs = inputs
-		self.output = []				
+class Dense:
+	def __init__(self, n_inputs, n_neurons, activation):
+		self.weights = 0.01*np.random.randn(n_inputs, n_neurons)
+		self.biases = np.zeros((1,n_neurons))				
 		self.activation = activation
 
-	def forward_pass(self):
-		self.output = np.dot(self.inputs, self.weights)
+	def forward_pass(self, inputs):
+		self.output = np.dot(np.array(inputs), np.array(self.weights)) + self.biases
 			
 
 def ReLu(inputs):
 	return np.maximum(0, inputs)
 
+"""def initalizer(prev_layer_size, layer_size):
+	return {
+		'W': np.zeros((prev_layer_size,layer_size)),
+		'b': np.zeros((1, layer_size))
+	}"""
 
-layer = Layer(weights, inputs, ReLu)
-layer.forward_pass()
-print(layer.output)
+inputs = [[1.0,3.0], [0.1,2.1]]
+
+layer = Dense(2, 3, ReLu)
+layer.forward_pass(inputs)
+
+print(layer.output[:5])
 
 
 
