@@ -1,4 +1,9 @@
 import numpy as np
+import math
+from nnfs.datasets import spiral_data, vertical_data
+import activations 
+from loss import *
+
 
 class Dense:
 	def __init__(self, n_inputs, n_neurons, activation):
@@ -10,28 +15,28 @@ class Dense:
 		self.output = self.activation(np.dot(np.array(inputs), np.array(self.weights)) + self.biases)
 			
 
-def ReLu(inputs):
-	return np.maximum(0, inputs)
-
-def Softmax(inputs):
-	exp_inputs = np.exp(inputs - np.max(inputs, axis=1, keepdims=True))
-	return exp_inputs / np.sum(exp_inputs, axis=1, keepdims=True)
-
-
-"""def initalizer(prev_layer_size, layer_size):
-	return {
-		'W': np.zeros((prev_layer_size,layer_size)),
-		'b': np.zeros((1, layer_size))
-	}"""
-
+X,y = vertical_data(100,3)
 inputs = [[1.0,3.0], [0.1,2.1]]
 
-layer1 = Dense(2, 3, ReLu)
-output_layer = Dense(3,3, Softmax)
+layer1 = Dense(2, 3, activations.ReLu)
+output_layer = Dense(3,3, activations.Softmax)
 layer1.forward_pass(X)
 output_layer.forward_pass(layer1.output)
 
-print(output_layer.output[:5])
+softmax_outputs = np.array([[0.2,0.43,0.4], [0.1, 0.01, 0.2], [0.23, 0.24, 0.01]])
+class_targets = np.array([[1,0,0], [0,1,0], [0,0,1]])
+
+loss_function = Loss_CCE()
+loss = loss_function.calculate(output_layer.output, y)
+print(loss)
+
+predictions = np.argmax(output_layer.output, axis=1)
+if len(y.shape) == 2:
+	y = np.argmax(y, axis=1)
+accuracy = np.mean(y==predictions)
+print(accuracy)
+
+#print(output_layer.output[:5])
 
 
 
