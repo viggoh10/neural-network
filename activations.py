@@ -1,10 +1,27 @@
 import numpy as np
+import loss
 
-def ReLu(inputs):
-	return np.maximum(0, inputs)
+class ReLu:
+	def forward(self, inputs):
+		self.inputs = inputs
+		self.output = np.maximum(0, inputs)
+	
+	def backward(self, dvalues):
+		self.dinputs = dvalues.copy()
+		self.dinputs[self.inputs <= 0] = 0
+		#return np.where(dvalues <= 0, 0, 1)
 
-def Softmax(inputs):
-	exp_inputs = np.exp(inputs - np.max(inputs, axis=1, keepdims=True))
-	return exp_inputs / np.sum(exp_inputs, axis=1, keepdims=True)
+class Softmax:
+	def forward(self, inputs):
+		self.inputs = inputs
+		exp_inputs = np.exp(inputs - np.max(inputs, axis=1, keepdims=True))
+		self.output = exp_inputs / np.sum(exp_inputs, axis=1, keepdims=True)
 
+	def backward(self, dvalues):
+		self.dinputs = np.empty_like(dvalues)
+
+		for i, (single_output, single_dvalues) in enumerate(zip(self.output, dvalues)):
+			single_output = single_output.reshape(-1,1)
+			jacobian = np.diagflat(single_output) - np.dot(single_output, single_output.T)
+			self.dinputs[i] = np.dot(jacobian, single_dvalues)
 
